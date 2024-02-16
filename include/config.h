@@ -562,6 +562,13 @@
 #endif
 
 /*
+ * Defaults for rt68 targets
+ */
+#ifdef TARGET_RT68_IMG
+# define MACHINE_RT68
+#endif
+
+/*
  * Defaults for the Amiga machine
  */
 #ifdef MACHINE_AMIGA
@@ -641,6 +648,28 @@
 # endif
 # ifndef AES_STACK_SIZE
 #  define AES_STACK_SIZE 2048   /* in LONGs */
+# endif
+#endif
+
+
+/*
+ * Defaults for the rt68 machine
+ */
+#ifdef MACHINE_RT68
+# ifndef CONF_ATARI_HARDWARE
+#  define CONF_ATARI_HARDWARE 0
+# endif
+# ifndef CONF_WITH_FLEXCAN
+#  define CONF_WITH_FLEXCAN 0
+# endif
+# ifndef CONF_DETECT_FIRST_BOOT_WITHOUT_MEMCONF
+#  define CONF_DETECT_FIRST_BOOT_WITHOUT_MEMCONF 0
+# endif
+# ifndef CONF_WITH_BUS_ERROR
+#  define CONF_WITH_BUS_ERROR 1
+# endif
+# ifndef CONF_VRAM_ADDRESS
+#  define CONF_VRAM_ADDRESS 0x40000000
 # endif
 #endif
 

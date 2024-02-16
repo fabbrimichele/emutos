@@ -313,6 +313,10 @@ ifeq (1,$(COLDFIRE))
   bios_src += coldfire.c coldfire2.S spi_cf.c
 endif
 
+ifeq (1,$(RT68))
+  bios_src += rt68.c rt68.S
+endif
+
 #
 # source code in bdos/
 #
@@ -653,6 +657,30 @@ amiga:
 
 $(ROM_AMIGA): emutos.img mkrom
 	./mkrom amiga $< $(ROM_AMIGA)
+
+#
+# RT68 Image
+#
+
+TOCLEAN += *.img
+
+IMG_RT68 = emutos-rt68.img
+RT68_DEFS =
+
+.PHONY: rt68
+NODEP += rt68
+rt68: UNIQUE = $(COUNTRY)
+rt68: OPTFLAGS = $(SMALL_OPTFLAGS)
+rt68: override DEF += -DTARGET_RT68_IMG $(RT68_DEFS)
+#rt68: WITH_AES = 0
+#rt68: ROMSIZE = 128
+rt68:
+	@echo "# Building RT68 EmuTOS into $(IMG_RT68)"
+	$(MAKE) RT68=1 CPUFLAGS='$(CPUFLAGS)' DEF='$(DEF)' OPTFLAGS='$(OPTFLAGS)' UNIQUE=$(UNIQUE) IMG_RT68=$(IMG_RT68) $(IMG_RT68)
+	@printf "$(LOCALCONFINFO)"
+
+$(IMG_RT68): emutos.img
+	cp $< $(IMG_RT68)
 
 # Special Amiga ROM optimized for Vampire V2
 
