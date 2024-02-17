@@ -66,7 +66,9 @@
 #include "../cli/clistub.h"
 #endif
 
-
+//#ifdef MACHINE_RT68
+//#include "rt68.h"
+//#endif
 
 /*==== Defines ============================================================*/
 
@@ -381,6 +383,11 @@ static void bios_init(void)
      */
     KDEBUG(("init_system_timer()\n"));
     init_system_timer();
+
+
+#if defined(MACHINE_MAXI030)
+    rt68_init();
+#endif
 
     /*
      * Now we can enable interrupts.  Although VBL & timer interrupts will

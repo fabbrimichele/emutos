@@ -721,6 +721,9 @@ struct video_mode {
 };
 
 static const struct video_mode vmode_table[] = {
+#ifdef MACHINE_RT68
+    { 2,  640, 400},		    /* RT68 Framebuffer */
+#endif    
     { 4,  320, 200},            /* rez=0: ST low */
     { 2,  640, 200},            /* rez=1: ST medium */
     { 1,  640, 400},            /* rez=2: ST high */
