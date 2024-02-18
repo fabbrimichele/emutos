@@ -1,15 +1,22 @@
 #include "asmdefs.h"
 #include "rt68asm.h"
 
+
+    .globl _rt68_init
+_rt68_init:
+    jsr     BLINK_LED
+    // _rt68_rs232_init should also be called by the serial driver but in 
+    // order to debug the serial has to be initialised as soon as possible
+    jsr     _rt68_rs232_init
+    rts
+
 // Initialize DUART 
 // port A to 38.4k baud, 8-bits, no parity, with RTS/CTS flow control
 // port B to 9.6k baud, 8-bits, no parity, with no flow control
 
     .globl _rt68_rs232_init
 _rt68_rs232_init:
-    // Debug if the function is actually called
-    move.b  #1,_led1_port
-    
+    move.l a0,-(sp)    
     lea     _duart,a0
 
     // The following three instruction are are not
@@ -51,4 +58,29 @@ _DUART_PUTCR:
     beq     _DUART_PUTCR                   // Until transmitter ready
     move.b  #'A',DUART_TBA(a0)               // Transmit character from port A
 
+    // Serial init completed
+    jsr     BLINK_LED
+
+    move.l (sp)+,a0
     rts
+
+
+BLINK_LED:
+    move.b  #1,_led1_port
+    jsr     PAUSE
+    move.b  #0,_led1_port
+    jsr     PAUSE
+    move.b  #1,_led1_port
+    jsr     PAUSE
+    move.b  #0,_led1_port
+    jsr     PAUSE
+    rts
+
+PAUSE:
+    move.l  d1,-(sp)    
+    move.l  #32000,d1
+PAUSE_LOOP:    
+    sub.l   #1,d1
+    bne     PAUSE_LOOP
+    move.l  (sp)+,d1
+    rts        

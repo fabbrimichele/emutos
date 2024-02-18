@@ -17,7 +17,7 @@
  * option any later version.  See doc/license.txt for details.
  */
 
-/* #define ENABLE_KDEBUG */
+#define ENABLE_KDEBUG
 
 #include "emutos.h"
 #include "biosext.h"
@@ -62,13 +62,10 @@
 #include "amiga.h"
 #include "lisa.h"
 #include "coldfire.h"
+#include "rt68.h"
 #if WITH_CLI
 #include "../cli/clistub.h"
 #endif
-
-//#ifdef MACHINE_RT68
-//#include "rt68.h"
-//#endif
 
 /*==== Defines ============================================================*/
 
@@ -229,6 +226,11 @@ static void bios_init(void)
     KDEBUG(("amiga_uae_init()\n"));
     amiga_uae_init();
 #endif
+#if defined(MACHINE_RT68)
+    KDEBUG(("rt68_init()\n"));
+    rt68_init();
+#endif
+
 
     /* Initialize the processor */
     KDEBUG(("processor_init()\n"));
@@ -383,11 +385,6 @@ static void bios_init(void)
      */
     KDEBUG(("init_system_timer()\n"));
     init_system_timer();
-
-
-#if defined(MACHINE_MAXI030)
-    rt68_init();
-#endif
 
     /*
      * Now we can enable interrupts.  Although VBL & timer interrupts will
