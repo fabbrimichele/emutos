@@ -1,13 +1,13 @@
 #include "emutos.h"
 #include "rt68.h"
 
-#define SERDATR     *(volatile UBYTE*)0x37e801
-#define SERDAT      *(volatile UBYTE*)0x37e803
-#define SERDAT_TBE  4 /* bit2: Transmit Buffer */
+#ifdef MACHINE_RT68
 
 // TODO: https://github.com/emutos/emutos/blob/9c42ef0f2c2fa9d1e217fced9da68901b2326e8b/bios/dana.c
 
-
+//*******************************************
+// General
+//*******************************************
 BOOL rt68_rs232_initialized = FALSE;
 
 extern void rt68_init(void) {
@@ -16,6 +16,14 @@ extern void rt68_init(void) {
     rt68_68681_init();
     rt68_rs232_initialized = TRUE;
 }
+
+
+//*******************************************
+// Serial
+//*******************************************
+#define SERDATR     *(volatile UBYTE*)0x37e801
+#define SERDAT      *(volatile UBYTE*)0x37e803
+#define SERDAT_TBE  4 /* bit2: Transmit Buffer */
 
 void rt68_rs232_init(void) 
 { 
@@ -39,3 +47,28 @@ void rt68_rs232_writeb(UBYTE b)
         SERDAT = b;
     }
 }
+
+
+//*******************************************
+// Screen
+//*******************************************
+
+const UBYTE *rt68_screenbase;
+
+
+ULONG rt68_initial_vram_size(void)
+{
+    return (RT68_SCREEN_WIDTH * RT68_SCREEN_HEIGHT) / 8;
+}
+
+void rt68_setphys(const UBYTE *addr)
+{
+    rt68_screenbase = addr;
+}
+
+const UBYTE *rt68_physbase(void)
+{
+    return rt68_screenbase;
+}
+
+#endif /* MACHINE_RT68 */

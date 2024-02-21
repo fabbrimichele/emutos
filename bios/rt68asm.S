@@ -42,29 +42,23 @@ _rt68_68681_init:
     move.b #0x01,DUART_SOPR(a0)
 
     // Serial init completed
-    jsr     BLINK_LED
-    jsr     BLINK_LED
-
     move.l (sp)+,a0
     rts
 
 
-BLINK_LED:
+    .globl _blink_led
+_blink_led:
     move.b  #1,_led1_port
-    jsr     PAUSE
+    jsr     pause
     move.b  #0,_led1_port
-    jsr     PAUSE
-    move.b  #1,_led1_port
-    jsr     PAUSE
-    move.b  #0,_led1_port
-    jsr     PAUSE
+    jsr     pause
     rts
 
-PAUSE:
+pause:
     move.l  d1,-(sp)    
-    move.l  #32000,d1
-PAUSE_LOOP:    
+    move.l  #64000,d1
+pause_loop:    
     sub.l   #1,d1
-    bne     PAUSE_LOOP
+    bne     pause_loop
     move.l  (sp)+,d1
     rts        

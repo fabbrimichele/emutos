@@ -674,8 +674,8 @@
 # ifndef CONF_WITH_BUS_ERROR
 #  define CONF_WITH_BUS_ERROR 1
 # endif
-# ifndef CONF_VRAM_ADDRESS
-#  define CONF_VRAM_ADDRESS 0x0037D000                            
+# ifndef CONF_VRAM_ADDRESS                        
+#  define CONF_VRAM_ADDRESS 0x00370000                            
 # endif
 #endif
 
