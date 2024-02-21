@@ -1,21 +1,11 @@
 #include "asmdefs.h"
 #include "rt68asm.h"
 
-
-    .globl _rt68_init
-_rt68_init:
-    jsr     BLINK_LED
-    // _rt68_rs232_init should also be called by the serial driver but in 
-    // order to debug the serial has to be initialised as soon as possible
-    jsr     _rt68_rs232_init
-    rts
-
 // Initialize DUART 
 // port A to 38.4k baud, 8-bits, no parity, with RTS/CTS flow control
 // port B to 9.6k baud, 8-bits, no parity, with no flow control
-
-    .globl _rt68_rs232_init
-_rt68_rs232_init:
+    .globl _rt68_68681_init
+_rt68_68681_init:
     move.l a0,-(sp)    
     lea     _duart,a0
 
@@ -51,14 +41,8 @@ _rt68_rs232_init:
     // see application note: AN405 - RTS/CTS Functions
     move.b #0x01,DUART_SOPR(a0)
 
-
-    // test sending a character
-_DUART_PUTCR:    
-    btst.b  #DUART_TXRDY,DUART_SRA(a0)     // Test transmitter ready status
-    beq     _DUART_PUTCR                   // Until transmitter ready
-    move.b  #'A',DUART_TBA(a0)               // Transmit character from port A
-
     // Serial init completed
+    jsr     BLINK_LED
     jsr     BLINK_LED
 
     move.l (sp)+,a0
