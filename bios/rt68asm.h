@@ -16,6 +16,8 @@
 #define DUART_ACR           4
 #define DUART_ISR           5
 #define DUART_IMR           5
+#define DUART_CTU           6
+#define DUART_CTL           7
 #define DUART_MR1B          8
 #define DUART_MR2B          8
 #define DUART_SRB           9
@@ -24,7 +26,9 @@
 #define DUART_RBB           11
 #define DUART_TBB           11
 #define DUART_IVR           12
+#define DUART_STRC          14
 #define DUART_SOPR          14
+#define DUART_STPC          15
 #define DUART_ROPR          15
 
 // REGISTERS BITS

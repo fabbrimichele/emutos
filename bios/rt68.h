@@ -9,7 +9,8 @@
 
 // General
 extern void rt68_init(void);
-
+extern void rt68_init_system_timer(void);
+extern void rt68_int_1(void);
 
 // Serial
 extern void rt68_rs232_init(void);
