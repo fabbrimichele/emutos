@@ -797,7 +797,9 @@ void biosmain(void)
     /* boot eventually from a block device (floppy or harddisk) */
     blkdev_boot();
 
+    KDEBUG(("Dsetdrv(bootdev)\n"));
     Dsetdrv(bootdev);           /* Set boot drive */
+    KDEBUG(("init_default_environment()\n"));
     init_default_environment(); /* Build default environment string */
 
 #if ENABLE_RESET_RESIDENT
@@ -805,10 +807,12 @@ void biosmain(void)
 #endif
 
 #if WITH_CLI
+        KDEBUG(("WITH_CLI set\n"));
     if (bootflags & BOOTFLAG_EARLY_CLI) {
         /*
          * run an early console, passing the default environment
          */
+        KDEBUG(("run an early console\n"));
         PD *pd = (PD *) Pexec(PE_BASEPAGEFLAGS, (char *)PF_STANDARD, "", default_env);
         pd->p_tbase = (UBYTE *) coma_start;
         pd->p_tlen = pd->p_dlen = pd->p_blen = 0;
@@ -816,6 +820,7 @@ void biosmain(void)
     }
 #endif
 
+    KDEBUG(("autoexec()\n"));
     autoexec();                 /* autoexec PRGs from AUTO folder */
 
     /* clear commandline */
@@ -825,6 +830,7 @@ void biosmain(void)
          * Pexec a program called COMMAND.PRG
          * like Atari TOS, it inherits an empty environment
          */
+        KDEBUG(("Pexec(PE_LOADGO, \"COMMAND.PRG\", \"\", NULL)\n"));
         Pexec(PE_LOADGO, "COMMAND.PRG", "", NULL);
     } else if (exec_os) {
         /*
@@ -832,14 +838,17 @@ void biosmain(void)
          * like Atari TOS, we pass the default environment
          */
         PD *pd;
+        KDEBUG(("Pexec(PE_BASEPAGEFLAGS, (char *)PF_STANDARD, \"\", default_env)\n"));
         pd = (PD *) Pexec(PE_BASEPAGEFLAGS, (char *)PF_STANDARD, "", default_env);
         pd->p_tbase = (UBYTE *) exec_os;
         pd->p_tlen = pd->p_dlen = pd->p_blen = 0;
+        KDEBUG(("Pexec(PE_GO, \"\", (char *)pd, default_env)\n"));
         Pexec(PE_GO, "", (char *)pd, default_env);
     }
 
 #if CONF_WITH_SHUTDOWN
     /* try to shutdown the machine / close the emulator */
+    KDEBUG(("shutdown()"));
     shutdown();
 #endif
 
@@ -847,6 +856,7 @@ void biosmain(void)
     cprintf("\033f");
 
     kcprintf(_("System halted!\n"));
+    KDEBUG(("halt()"));
     halt();
 }
 

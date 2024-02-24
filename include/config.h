@@ -677,6 +677,9 @@
 # ifndef CONF_VRAM_ADDRESS                        
 #  define CONF_VRAM_ADDRESS 0x00370000                            
 # endif
+# ifndef CONF_WITH_FAKE_VBL
+#  define CONF_WITH_FAKE_VBL 1
+# endif
 #endif
 
 /*

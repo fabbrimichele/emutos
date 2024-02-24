@@ -12,6 +12,7 @@
 
 #include "emutos.h"
 #include "rt68.h"
+#include "tosvars.h"
 
 #ifdef MACHINE_RT68
 
@@ -63,6 +64,8 @@ extern void rt68_init(void)
     //       possible the debug messages
     rt68_68681_init();
     rt68_rs232_initialized = TRUE;
+
+    phystop = (UBYTE*) (512L*1024L);
 }
 
 extern void rt68_init_system_timer(void)
