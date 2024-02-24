@@ -528,14 +528,9 @@ _int_timerc:
         //       in the RT68 framebuffer hardware
         // Faked VBL for platforms which don't have one
 #ifdef CONF_WITH_FAKE_VBL
-        move.b  vbl_tick_count, d0
-        addq.b  #1, d0
-        cmp.b   #4, d0                  // 200Hz / 50Hz
-        bne.b   no_vbl
+        // Note this is executed every 4 interrupts, 
+        // see `rol.w   _timer_c_sieve` a few lines above
         jsr     _int_vbl
-        clr.b   d0
-no_vbl:
-        move.b  d0, vbl_tick_count
 #endif
 
         // repeat keys
@@ -1447,10 +1442,6 @@ _keyclick:
 // ==== Variables ============================================================
 
         .bss
-#ifdef CONF_WITH_FAKE_VBL
-vbl_tick_count:
-        .dc.b    0
-#endif
 
         .even
 

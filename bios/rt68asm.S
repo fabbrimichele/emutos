@@ -84,12 +84,12 @@ duart_interrupt:
     // command, in timer mode the counting continues
     // (stop command is a read with A4-A1 = 1111)
     tst.b   DUART_STPC(a0)
-
     pea duart_interrupt_ret
     movw sr, d0
     movw d0, -(sp)
+    
     .extern _vector_5ms
-    movl _vector_5ms, a0
+    move.l  _vector_5ms,a0
     jmp (a0)
 
     // eventually returns to...
