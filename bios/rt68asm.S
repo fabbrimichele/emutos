@@ -60,7 +60,11 @@ _rt68_int_1:
     move.b  #4,DUART_CTU(a0)        
     move.b  #128,DUART_CTL(a0)        
 
-    move.b  #0b00001000,DUART_IMR(a0)    // xxxxCxxx: (C)ounter ready int = 1 ON
+    // xxxxCxRT: 
+    // (C)ounter ready int = 1 ON
+    // (R)eceiver ready int = 1 ON
+    // (T)ransmitter ready int = 0 OFF
+    move.b  #0b00001010,DUART_IMR(a0)    
     move.b  #64,DUART_IVR(a0)           // Interrupt vector = 64
     move.l  #duart_interrupt,0x100       // Vector (address) = $100 (64 x 4 = 256 = $100)
 
@@ -76,29 +80,37 @@ _rt68_int_1:
     rts
 
 duart_interrupt:
-    movem.l d0/a0,-(sp)                        // Save working register
+    movem.l d0/a0,-(sp)                         // Save working register
     lea     _duart,a0
-    btst.b  #DUART_IMR_CNTRDY,DUART_ISR(a0)    // Test Counter Ready interrupt    
-    beq     duart_interrupt_no_count_int       // No Counter Ready return
+    btst.b  #DUART_IMR_RXRDYA,DUART_ISR(a0)     // Test A Receiver Ready interrupt    
+    beq     duart_interrupt_test_counter        // No interrupt then test Counter Ready
+    move.b  DUART_RBA(A0),d0                    // Else read the character received by port A
+    move.w  d0, -(%sp)                          // I see that w is used also for bytes                                                
+    jsr     _rt68_rs232_interrupt               // when passing parameters to C functions
+    add.l   #2, sp                              // remove parameter from the SP
+    bra     duart_interrupt_end
+duart_interrupt_test_counter:    
+    btst.b  #DUART_IMR_CNTRDY,DUART_ISR(a0)     // Test Counter Ready interrupt    
+    beq     duart_interrupt_end                 // No Counter Ready return
     // Reset 68681 counter interrupt with stop 
     // command, in timer mode the counting continues
     // (stop command is a read with A4-A1 = 1111)
     tst.b   DUART_STPC(a0)
-    pea duart_interrupt_ret
-    movw sr, d0
-    movw d0, -(sp)
-    
+    pea duart_interrupt_count_ret
+    move.w  sr, d0
+    move.w  0, -(sp)
     .extern _vector_5ms
     move.l  _vector_5ms,a0
     jmp (a0)
 
     // eventually returns to...
-duart_interrupt_ret:
+duart_interrupt_count_ret:
     lea     _duart,a0
     tst.b   DUART_STRC(a0)                  // Enable timer interrupt
-duart_interrupt_no_count_int:    
+duart_interrupt_end:    
     movem.l (sp)+,d0/a0                     // Restore working register
     rte
+
 
     .globl _blink_led
 _blink_led:

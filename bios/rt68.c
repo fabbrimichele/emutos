@@ -13,6 +13,7 @@
 #include "emutos.h"
 #include "rt68.h"
 #include "tosvars.h"
+#include "ikbd.h"
 
 #ifdef MACHINE_RT68
 
@@ -75,6 +76,20 @@ void rt68_rs232_writeb(UBYTE b)
     }
 }
 
+void rt68_rs232_interrupt(UBYTE b)
+{
+#if CONF_SERIAL_CONSOLE && !CONF_SERIAL_CONSOLE_POLLING_MODE
+    // This enable the keyboard from serial input stream
+    // TODO: I need to add the keyboard handling independently 
+    //       from the main serial channel (A). RT68 uses serial 
+    //       the channel (B) for serial and later also for
+    //       mouse.
+    push_ascii_ikbdiorec(b);
+#else
+    // This enable the standard serial serial input stream
+    push_serial_iorec(b);
+#endif
+}
 
 //*******************************************
 // Screen

@@ -1,6 +1,6 @@
 # Build
 ```shell
-make ?
+make rt68
 ```
 
 # Useful infos
