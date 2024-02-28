@@ -3,6 +3,9 @@
 make rt68
 ```
 
+# Bugs
+* IDE detection does not work
+
 # Useful infos
 * https://github.com/emutos/emutos/compare/master...aslak3:emutos:master
 * https://github.com/emutos/emutos/pull/29/files

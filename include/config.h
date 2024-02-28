@@ -680,6 +680,9 @@
 # ifndef CONF_WITH_FAKE_VBL
 #  define CONF_WITH_FAKE_VBL 1
 # endif
+# ifndef CONF_WITH_IDE
+#  define CONF_WITH_IDE 1
+# endif
 #endif
 
 /*

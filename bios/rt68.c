@@ -17,12 +17,6 @@
 
 #ifdef MACHINE_RT68
 
-/* 
-TODOs: 
-- Check missing functions here: https://github.com/emutos/emutos/blob/9c42ef0f2c2fa9d1e217fced9da68901b2326e8b/bios/dana.c
-*/
-
-
 //*******************************************
 // General
 //*******************************************

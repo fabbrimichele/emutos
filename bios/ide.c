@@ -15,7 +15,7 @@
  * Note: this driver does not support CHS addressing.
  */
 
-/* #define ENABLE_KDEBUG */
+#define ENABLE_KDEBUG
 
 #include "emutos.h"
 #include "asm.h"
@@ -36,6 +36,7 @@
 #include "biosmem.h"
 #include "amiga.h"
 #include "intmath.h"
+#include "rt68.h"
 
 #if CONF_WITH_IDE
 
@@ -149,6 +150,11 @@ struct IDE
 #define xferswap(a) swpw2(a)
 #define ide_get_and_incr(src,dst) asm volatile("move.l (%1),(%0)+" : "=a"(dst): "a"(src), "0"(dst));
 #define ide_put_and_incr(src,dst) asm volatile("move.l (%0)+,(%1)" : "=a"(src): "a"(dst), "0"(src));
+#elif defined(MACHINE_RT68)
+#define XFERWIDTH   UBYTE
+#define xferswap(a) swpw(a) // Not used kept for compatibility
+#define ide_get_and_incr(src,dst) asm volatile("move.b (%1),(%0)+" : "=a"(dst): "a"(src), "0"(dst));
+#define ide_put_and_incr(src,dst) asm volatile("move.b (%0)+,(%1)" : "=a"(src): "a"(dst), "0"(src));
 #else
 #define XFERWIDTH   UWORD
 #define xferswap(a) swpw(a)
@@ -904,6 +910,14 @@ static void ide_get_data_32(volatile struct IDE *interface,UBYTE *buffer,ULONG b
 }
 #endif /* CONF_WITH_APOLLO_68080 */
 
+#if defined(MACHINE_RT68)
+static void ide_get_data_8(volatile struct IDE *interface,UBYTE *buffer,ULONG bufferlen,int need_byteswap)
+{
+    // TODO
+    KDEBUG(("ide_get_data_8(...) NOT IMPLEMENTED ************************ "));
+}
+#endif
+
 /*
  * get data from IDE device
  */
@@ -922,6 +936,11 @@ static void ide_get_data(volatile struct IDE *interface,UBYTE *buffer,ULONG buff
         ide_get_data_32(interface, buffer, bufferlen, need_byteswap);
         return;
     }
+#endif
+
+#if defined(MACHINE_RT68)
+    ide_get_data_8(interface, buffer, bufferlen, need_byteswap);
+    return;
 #endif
 
     if (need_byteswap) {
@@ -1074,6 +1093,15 @@ static LONG ide_read(UBYTE cmd,UWORD ifnum,UWORD dev,ULONG sector,UWORD count,UB
     return rc;
 }
 
+#if defined(MACHINE_RT68)
+static void ide_put_data_8(volatile struct IDE *interface,UBYTE *buffer,ULONG bufferlen,int need_byteswap)
+{
+    // TODO
+    KDEBUG(("ide_put_data_8(...) NOT IMPLEMENTED ************************ "));
+}
+#endif
+
+
 /*
  * send data to IDE device
  */
@@ -1083,6 +1111,11 @@ static void ide_put_data(volatile struct IDE *interface,UBYTE *buffer,ULONG buff
     XFERWIDTH *end;
     UWORD *p2;
     UWORD *end2 = (UWORD *)(buffer + bufferlen);
+
+#if defined(MACHINE_RT68)
+    ide_put_data_8(interface, buffer, bufferlen, need_byteswap);
+    return;
+#endif    
 
     if (need_byteswap) {
         end = (XFERWIDTH *)(buffer + (bufferlen & ~(16-1)));    /* mask must match unrolled loop */
