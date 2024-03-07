@@ -10,7 +10,7 @@
  * option any later version.  See doc/license.txt for details.
  */
 
-/*#define ENABLE_KDEBUG*/
+#define ENABLE_KDEBUG
 
 #include "emutos.h"
 #include "gemerror.h"
@@ -23,6 +23,7 @@
 #include "tosvars.h"
 #include "machine.h"
 #include "ide.h"
+#include "cf.h"
 #include "acsi.h"
 #include "scsi.h"
 #include "sd.h"
@@ -189,6 +190,9 @@ void disk_init_all(void)
 #if CONF_WITH_SDMMC
         24, 25, 26, 27, 28, 29, 30, 31      /* SD/MMC */
 #endif
+#if CONF_WITH_CF
+        32                                  /* SD/MMC */
+#endif
     };
     int i;
     LONG devices_available = 0L;
@@ -259,6 +263,8 @@ void disk_init_all(void)
  */
 LONG disk_mediach(UWORD unit)
 {
+    KDEBUG(("disk_mediach\n"));
+
     UWORD major = unit - NUMFLOPPIES;
     LONG ret;
     WORD bus, reldev;
@@ -281,6 +287,8 @@ LONG disk_mediach(UWORD unit)
     reldev = major - bus * DEVICES_PER_BUS;
     MAYBE_UNUSED(reldev);
 
+    KDEBUG(("bus=%d (CF_BUS = 4)\n",bus));
+
     /* hardware access to device */
     switch(bus) {
 #if CONF_WITH_ACSI
@@ -298,6 +306,11 @@ LONG disk_mediach(UWORD unit)
         ret = ide_ioctl(reldev,GET_MEDIACHANGE,NULL);
         break;
 #endif /* CONF_WITH_IDE */
+#if CONF_WITH_CF
+    case CF_BUS:
+        ret = cf_ioctl(reldev,GET_MEDIACHANGE,NULL);
+        break;
+#endif /* CONF_WITH_CF */
 #if CONF_WITH_SDMMC
     case SDMMC_BUS:
         ret = sd_ioctl(reldev,GET_MEDIACHANGE,NULL);
@@ -788,6 +801,8 @@ static LONG natfeats_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, c
 /* Get unit information, using our internal drivers only. */
 static LONG internal_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, char *productname, UWORD stringlen)
 {
+    KDEBUG(("internal_inquire("));
+
     UWORD major = unit - NUMFLOPPIES;
     LONG ret;
     WORD bus, reldev;
@@ -798,6 +813,8 @@ static LONG internal_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, c
 
     bus = GET_BUS(major);
     reldev = major - bus * DEVICES_PER_BUS;
+
+    KDEBUG(("bus=%d (CF_BUS = 4)\n",bus));
 
     /*
      * hardware access to device
@@ -821,6 +838,11 @@ static LONG internal_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, c
         ret = ide_ioctl(reldev,GET_DISKNAME,name);
         break;
 #endif /* CONF_WITH_IDE */
+#if CONF_WITH_CF
+    case CF_BUS:
+        ret = cf_ioctl(reldev,GET_DISKNAME,name);
+        break;
+#endif /* CONF_WITH_CF */
 #if CONF_WITH_SDMMC
     case SDMMC_BUS:
         ret = sd_ioctl(reldev,GET_DISKNAME,name);
@@ -863,6 +885,7 @@ LONG disk_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, char *produc
 /* Get unit capacity */
 LONG disk_get_capacity(UWORD unit, ULONG *blocks, ULONG *blocksize)
 {
+    KDEBUG(("disk_get_capacity\n"));
     UWORD major = unit - NUMFLOPPIES;
     LONG ret;
     ULONG info[2] = { 0UL, 512UL }; /* #sectors, sectorsize */
@@ -878,6 +901,8 @@ LONG disk_get_capacity(UWORD unit, ULONG *blocks, ULONG *blocksize)
 
     bus = GET_BUS(major);
     reldev = major - bus * DEVICES_PER_BUS;
+
+    KDEBUG(("bus=%d (CF_BUS = 4)\n",bus));
 
     /* hardware access to device */
     switch(bus) {
@@ -905,6 +930,14 @@ LONG disk_get_capacity(UWORD unit, ULONG *blocks, ULONG *blocksize)
             return ret;
         break;
 #endif /* CONF_WITH_IDE */
+#if CONF_WITH_CF
+    case CF_BUS:
+        ret = cf_ioctl(reldev,GET_DISKINFO,info);
+        KDEBUG(("cf_ioctl(%d) returned %ld\n", reldev, ret));
+        if (ret < 0)
+            return ret;
+        break;
+#endif /* CONF_WITH_CF */
 #if CONF_WITH_SDMMC
     case SDMMC_BUS:
         ret = sd_ioctl(reldev,GET_DISKINFO,info);
@@ -975,6 +1008,12 @@ LONG disk_rw(UWORD unit, UWORD rw, ULONG sector, UWORD count, UBYTE *buf)
         break;
     }
 #endif /* CONF_WITH_IDE */
+#if CONF_WITH_CF
+    case CF_BUS:
+        ret = cf_rw(rw, sector, count, buf, reldev, FALSE);
+        KDEBUG(("cf_rw() returned %ld\n", ret));
+        break;
+#endif /* CONF_WITH_CF */
 #if CONF_WITH_SDMMC
     case SDMMC_BUS:
         ret = sd_rw(rw, sector, count, buf, reldev);

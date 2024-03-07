@@ -536,6 +536,9 @@ static ULONG check_busses(void)
     if (detect_ide())
         found |= (1 << IDE_BUS);
 #endif
+#if CONF_WITH_CF
+        found |= (1 << CF_BUS);
+#endif
 
     return found;
 }

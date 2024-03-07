@@ -11,6 +11,11 @@
         "utility": "c",
         "istream": "c",
         "ostream": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "asm.h": "c",
+        "emutos.h": "c",
+        "coldfire.h": "c",
+        "gemerror.h": "c",
+        "blkdev.h": "c"
     }
 }
