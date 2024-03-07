@@ -675,12 +675,11 @@ rt68: OPTFLAGS = $(SMALL_OPTFLAGS)
 rt68: override DEF += -DTARGET_RT68_IMG $(RT68_DEFS)
 rt68: WITH_AES = 0
 rt68: WITH_CLI = 1
-rt68: CONF_WITH_CF=1
 rt68: ROMSIZE = 512
 rt68: ROM_PADDED = $(IMG_RT68)
 rt68:
 	@echo "# Building RT68 EmuTOS into $(ROM_PADDED)"
-	$(MAKE) RT68=1 CPUFLAGS='$(CPUFLAGS)' DEF='$(DEF)' OPTFLAGS='$(OPTFLAGS)' UNIQUE=$(COUNTRY) CONF_WITH_CF=$(CONF_WITH_CF) WITH_AES=$(WITH_AES) ROMSIZE=$(ROMSIZE) ROM_PADDED=$(ROM_PADDED) $(ROM_PADDED)
+	$(MAKE) RT68=1 CPUFLAGS='$(CPUFLAGS)' DEF='$(DEF)' OPTFLAGS='$(OPTFLAGS)' UNIQUE=$(COUNTRY) WITH_AES=$(WITH_AES) ROMSIZE=$(ROMSIZE) ROM_PADDED=$(ROM_PADDED) $(ROM_PADDED)
 	@printf "$(LOCALCONFINFO)"
 # TODO: it shouldn't be necessary to run ./mkrom manually, it should work passing the parameter ROM_PADDED=$(ROM_PADDED) to the make
 # TODO: check that the last bytes of the ROM are the starting address of the ROM
