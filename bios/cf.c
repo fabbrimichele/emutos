@@ -48,16 +48,17 @@
 #define CF_MASTER      0
 
 
-static int cf_wait_for_not_busy(void);
-static int cf_wait_for_command_ready(void);
-static int cf_wait_for_data_ready(void);
-static int cf_check_for_error(void);
+static LONG cf_wait_for_not_busy(void);
+static LONG cf_wait_for_command_ready(void);
+static LONG cf_wait_for_data_ready(void);
+static LONG cf_check_for_error(void);
+static LONG cf_check_for_error_and_disk_fault(void);
 static LONG cf_write(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer);
 static LONG cf_read(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer);
-static int cf_set_command(UBYTE cmd);
+static LONG cf_set_command(UBYTE cmd);
 static void cf_set_start_count(LONG sector, UBYTE count);
-static void cf_put_data(UBYTE *buffer, ULONG bufferlen);
-static void cf_get_data(UBYTE *buffer, ULONG bufferlen);
+static LONG cf_put_data(UBYTE *buffer, ULONG bufferlen);
+static LONG cf_get_data(UBYTE *buffer, ULONG bufferlen);
 static LONG cf_identify(void);
 
 static struct {
@@ -93,12 +94,9 @@ static BOOL is_initialized = FALSE;
 static ULONG delay400ns;
 
 /******************************************************
- * TODO: check in RT68 bios if any delay is required
  * TODO: try without debug
  * TODO: check TODOs in the code
  ******************************************************/
-
-
 
 
 void cf_init(void) 
@@ -199,8 +197,9 @@ static LONG cf_write(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer)
 
     while (count > 0)
     {
-        // TODO: EmuTOS checks for error here
-        cf_put_data(buffer, SECTOR_SIZE);
+        if (cf_put_data(buffer, SECTOR_SIZE))
+            return EWRITF;
+
         buffer += SECTOR_SIZE;
         count -= 1;
     }
@@ -220,8 +219,9 @@ static LONG cf_read(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer)
 
     while (count > 0)
     {
-        // TODO: EmuTOS checks for error here
-        cf_get_data(buffer, SECTOR_SIZE);
+        if (cf_get_data(buffer, SECTOR_SIZE) != E_OK)
+            return EREADF;
+        
         buffer += SECTOR_SIZE;
         count -= 1;
     }
@@ -231,7 +231,7 @@ static LONG cf_read(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer)
     return E_OK;
 }
 
-static void cf_put_data(UBYTE *buffer, ULONG bufferlen)
+static LONG cf_put_data(UBYTE *buffer, ULONG bufferlen)
 {
     KDEBUG(("cf_put_data\n"));
     UBYTE *end = (UBYTE *)(buffer + bufferlen);
@@ -241,9 +241,11 @@ static void cf_put_data(UBYTE *buffer, ULONG bufferlen)
     {
         CF_WRITE_DATA(*buffer++);
     }
+
+    return cf_check_for_error_and_disk_fault();
 }
 
-static void cf_get_data(UBYTE *buffer, ULONG bufferlen)
+static LONG cf_get_data(UBYTE *buffer, ULONG bufferlen)
 {
     KDEBUG(("cf_get_data\n"));
     UBYTE *end = (UBYTE *)(buffer + bufferlen);
@@ -253,9 +255,11 @@ static void cf_get_data(UBYTE *buffer, ULONG bufferlen)
     {
         *buffer++ = CF_READ_DATA();
     }
+
+    return cf_check_for_error_and_disk_fault();
 }
 
-static int cf_set_command(UBYTE cmd)
+static LONG cf_set_command(UBYTE cmd)
 {
     KDEBUG(("cf_set_command\n"));
 
@@ -278,34 +282,51 @@ static void cf_set_start_count(LONG sector, UBYTE count)
     CF_WRITE_SECTOR_COUNT(count);
 }
 
-static int cf_wait_for_data_ready(void)
+static LONG cf_wait_for_data_ready(void)
 {
     KDEBUG(("cf_wait_for_data_ready\n"));
     DELAY_400NS;
+    // TODO: add timeout and manage errors in the caller
     while ((CF_READ_STATUS() & (CF_STATUS_DRQ | CF_STATUS_BSY)) != CF_STATUS_DRQ) {}
     return E_OK;
 }
 
-static int cf_wait_for_command_ready(void)
+static LONG cf_wait_for_command_ready(void)
 {
     KDEBUG(("cf_wait_for_command_ready\n"));
     DELAY_400NS;
+    // TODO: add timeout and manage errors in the caller
     while ((CF_READ_STATUS() & (CF_STATUS_DRDY | CF_STATUS_BSY)) != CF_STATUS_DRDY) {}
     return E_OK;
 }
 
-static int cf_wait_for_not_busy(void)
+static LONG cf_wait_for_not_busy(void)
 {
     KDEBUG(("cf_wait_for_not_busy\n"));
     DELAY_400NS;
+    // TODO: add timeout and manage errors in the caller
     while((CF_READ_STATUS() & CF_STATUS_BSY) != 0) {}
     return E_OK;
 }
 
-static int cf_check_for_error(void) {
+static LONG cf_check_for_error(void) {
     KDEBUG(("cf_check_for_error\n"));
+    DELAY_400NS;
     UBYTE status = CF_READ_STATUS();
     if ((status & CF_STATUS_ERR) != 0)
+    {
+        KDEBUG(("Error, status = %x\n", status));
+        return ERR;
+    }
+    else 
+        return E_OK;
+}
+
+static LONG cf_check_for_error_and_disk_fault(void) {
+    KDEBUG(("cf_check_for_error_and_disk_fault\n"));
+    DELAY_400NS;
+    UBYTE status = CF_READ_STATUS();
+    if ((status & (CF_STATUS_ERR | CF_STATUS_DF)) != 0)
     {
         KDEBUG(("Error, status = %x\n", status));
         return ERR;
