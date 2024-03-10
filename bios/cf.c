@@ -274,7 +274,7 @@ static void cf_set_start_count(LONG sector, UBYTE count)
     CF_WRITE_LBA0((UBYTE)sector);
     CF_WRITE_LBA1((UBYTE)(sector >> 8));
     CF_WRITE_LBA2((UBYTE)(sector >> 16));
-    CF_WRITE_LBA3(CF_MODE_LBA|CF_DEVICE(CF_MASTER)|(UBYTE)((sector >> 24)&&0x0f));
+    CF_WRITE_LBA3(CF_MODE_LBA|CF_DEVICE(CF_MASTER)|(UBYTE)((sector >> 24)&0x0f));
     CF_WRITE_SECTOR_COUNT(count);
 }
 
