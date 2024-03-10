@@ -16,6 +16,7 @@
         "emutos.h": "c",
         "coldfire.h": "c",
         "gemerror.h": "c",
-        "blkdev.h": "c"
+        "blkdev.h": "c",
+        "string.h": "c"
     }
 }

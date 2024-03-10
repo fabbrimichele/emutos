@@ -2,6 +2,8 @@
 #define ENABLE_KDEBUG
 
 #include "emutos.h"
+#include "asm.h"
+#include "delay.h"
 #include "gemerror.h"
 #include "disk.h"
 #include "blkdev.h"
@@ -13,7 +15,9 @@
 #define NOT_INITIZED    0
 #define INITIALIZED     1
 
-#define cf_interface           ((volatile struct IDE *)0x0037F800)
+#define DELAY_400NS     delay_loop(delay400ns)
+
+#define cf_interface                ((volatile struct IDE *)0x0037F800)
 
 #define CF_READ_STATUS()            cf_interface->command
 #define CF_WRITE_COMMAND(a)         cf_interface->command = a
@@ -85,8 +89,8 @@ struct IDE
     UBYTE command;          
 };
 
-BOOL is_initialized = FALSE;
-
+static BOOL is_initialized = FALSE;
+static ULONG delay400ns;
 
 /******************************************************
  * TODO: check in RT68 bios if any delay is required
@@ -100,6 +104,8 @@ BOOL is_initialized = FALSE;
 void cf_init(void) 
 {
     KDEBUG(("CF initialization\n"));
+
+    delay400ns = loopcount_1_msec / 2500;
     KDEBUG(("CF_WRITE_COMMAND(CF_CMD_RESET)\n"));
     CF_WRITE_COMMAND(CF_CMD_RESET);
     if (cf_wait_for_not_busy() == ERR)
@@ -274,8 +280,8 @@ static void cf_set_start_count(LONG sector, UBYTE count)
 
 static int cf_wait_for_data_ready(void)
 {
-    //KDEBUG(("cf_wait_for_data_ready\n");
-    // Wait until BSY is clear and DRQ is set
+    KDEBUG(("cf_wait_for_data_ready\n"));
+    DELAY_400NS;
     while ((CF_READ_STATUS() & (CF_STATUS_DRQ | CF_STATUS_BSY)) != CF_STATUS_DRQ) {}
     return E_OK;
 }
@@ -283,7 +289,7 @@ static int cf_wait_for_data_ready(void)
 static int cf_wait_for_command_ready(void)
 {
     KDEBUG(("cf_wait_for_command_ready\n"));
-    // Wait until BSY is clear and DRDY is set
+    DELAY_400NS;
     while ((CF_READ_STATUS() & (CF_STATUS_DRDY | CF_STATUS_BSY)) != CF_STATUS_DRDY) {}
     return E_OK;
 }
@@ -291,6 +297,7 @@ static int cf_wait_for_command_ready(void)
 static int cf_wait_for_not_busy(void)
 {
     KDEBUG(("cf_wait_for_not_busy\n"));
+    DELAY_400NS;
     while((CF_READ_STATUS() & CF_STATUS_BSY) != 0) {}
     return E_OK;
 }
