@@ -10,7 +10,7 @@
  * option any later version.  See doc/license.txt for details.
  */
 
-#define ENABLE_KDEBUG
+/*#define ENABLE_KDEBUG*/
 
 #include "emutos.h"
 #include "gemerror.h"
@@ -286,8 +286,6 @@ LONG disk_mediach(UWORD unit)
     bus = GET_BUS(major);
     reldev = major - bus * DEVICES_PER_BUS;
     MAYBE_UNUSED(reldev);
-
-    KDEBUG(("bus=%d (CF_BUS = 4)\n",bus));
 
     /* hardware access to device */
     switch(bus) {
@@ -814,8 +812,6 @@ static LONG internal_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, c
     bus = GET_BUS(major);
     reldev = major - bus * DEVICES_PER_BUS;
 
-    KDEBUG(("bus=%d (CF_BUS = 4)\n",bus));
-
     /*
      * hardware access to device
      *
@@ -901,8 +897,6 @@ LONG disk_get_capacity(UWORD unit, ULONG *blocks, ULONG *blocksize)
 
     bus = GET_BUS(major);
     reldev = major - bus * DEVICES_PER_BUS;
-
-    KDEBUG(("bus=%d (CF_BUS = 4)\n",bus));
 
     /* hardware access to device */
     switch(bus) {

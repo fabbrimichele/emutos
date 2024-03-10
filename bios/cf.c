@@ -15,10 +15,11 @@
 
 #define cf_interface           ((volatile struct IDE *)0x0037F800)
 
-#define CF_WRITE_COMMAND(a)         cf_interface->command = a
 #define CF_READ_STATUS()            cf_interface->command
+#define CF_WRITE_COMMAND(a)         cf_interface->command = a
 #define CF_READ_DATA()              cf_interface->data
-#define CF_WRITE_SECTOR_COUNT(a)    cf_interface->sector_count
+#define CF_WRITE_DATA(a)            cf_interface->data = a
+#define CF_WRITE_SECTOR_COUNT(a)    cf_interface->sector_count = a
 #define CF_WRITE_LBA0(a)            cf_interface->lba0 = a
 #define CF_WRITE_LBA1(a)            cf_interface->lba1 = a
 #define CF_WRITE_LBA2(a)            cf_interface->lba2 = a
@@ -47,10 +48,11 @@ static int cf_wait_for_not_busy(void);
 static int cf_wait_for_command_ready(void);
 static int cf_wait_for_data_ready(void);
 static int cf_check_for_error(void);
+static LONG cf_write(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer);
 static LONG cf_read(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer);
-static LONG cf_write(ULONG sector, UWORD count, UBYTE *buffer);
 static int cf_set_command(UBYTE cmd);
 static void cf_set_start_count(LONG sector, UBYTE count);
+static void cf_put_data(UBYTE *buffer, ULONG bufferlen);
 static void cf_get_data(UBYTE *buffer, ULONG bufferlen);
 static LONG cf_identify(void);
 
@@ -86,10 +88,11 @@ struct IDE
 BOOL is_initialized = FALSE;
 
 
-/***********************************************
- * TODO: use cf.c in disk.c
- * TODO: cheks in RT68 bios if any delay is required
- ***********************************************/
+/******************************************************
+ * TODO: check in RT68 bios if any delay is required
+ * TODO: try without debug
+ * TODO: check TODOs in the code
+ ******************************************************/
 
 
 
@@ -118,7 +121,7 @@ void cf_init(void)
 
 LONG cf_ioctl(WORD dev, UWORD ctrl, void *arg)
 {
-    KDEBUG(("cf_ioctl("));
+    //KDEBUG(("cf_ioctl("));
     LONG ret = ERR;
     ULONG *info = arg;
     int i;
@@ -128,7 +131,7 @@ LONG cf_ioctl(WORD dev, UWORD ctrl, void *arg)
 
     switch(ctrl) {
     case GET_DISKINFO:
-        KDEBUG(("GET_DISKINFO)\n"));
+        //KDEBUG(("GET_DISKINFO)\n"));
         ret = cf_identify();
         if (ret >= 0) {
             info[0] = MAKE_ULONG(identify.numsecs_lba28[1], identify.numsecs_lba28[0]);
@@ -137,7 +140,7 @@ LONG cf_ioctl(WORD dev, UWORD ctrl, void *arg)
         }
         break;
     case GET_DISKNAME:
-        KDEBUG(("GET_DISKNAME)\n"));
+        //KDEBUG(("GET_DISKNAME)\n"));
         ret = cf_identify();
         if (ret >= 0) {
             identify.model_number[39] = 0;  /* null terminate string */
@@ -151,12 +154,12 @@ LONG cf_ioctl(WORD dev, UWORD ctrl, void *arg)
         }
         break;
     case GET_MEDIACHANGE:
-        KDEBUG(("GET_MEDIACHANGE)\n"));
+        //KDEBUG(("GET_MEDIACHANGE)\n"));
         ret = MEDIANOCHANGE;
         break;
     }
 
-    KDEBUG(("UNKOWN)\n"));
+    //KDEBUG(("UNKOWN)\n"));
     return ret;
 }
 
@@ -176,13 +179,29 @@ LONG cf_rw(WORD rw, LONG sector, WORD count, UBYTE *buf, WORD dev, BOOL need_byt
     rw &= RW_RW;    /* we just care about read or write for now */
 
     // TODO: splits r/w by MAXSECS_PER_IO (see  EmuTOS ide.c)
-    return rw ? cf_write(sector, count, buf)
+    return rw ? cf_write(CF_CMD_WRITE_SECTOR, sector, count, buf)
             : cf_read(CF_CMD_READ_SECTOR, sector, count, buf);
 }
 
-static LONG cf_write(ULONG sector, UWORD count, UBYTE *buffer)
+static LONG cf_write(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer)
 {
-    return ERR;
+    KDEBUG(("cf_write\n"));
+
+    cf_set_start_count(sector, count);
+    if (cf_set_command(cmd) == ERR)
+        return ERR;
+
+    while (count > 0)
+    {
+        // TODO: EmuTOS checks for error here
+        cf_put_data(buffer, SECTOR_SIZE);
+        buffer += SECTOR_SIZE;
+        count -= 1;
+    }
+
+    cf_wait_for_not_busy();
+
+    return E_OK;
 }
 
 static LONG cf_read(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer) 
@@ -201,7 +220,21 @@ static LONG cf_read(UBYTE cmd, ULONG sector, UWORD count, UBYTE *buffer)
         count -= 1;
     }
 
+    cf_wait_for_not_busy();
+
     return E_OK;
+}
+
+static void cf_put_data(UBYTE *buffer, ULONG bufferlen)
+{
+    KDEBUG(("cf_put_data\n"));
+    UBYTE *end = (UBYTE *)(buffer + bufferlen);
+
+    cf_wait_for_data_ready();
+    while (buffer < end) 
+    {
+        CF_WRITE_DATA(*buffer++);
+    }
 }
 
 static void cf_get_data(UBYTE *buffer, ULONG bufferlen)
@@ -209,7 +242,6 @@ static void cf_get_data(UBYTE *buffer, ULONG bufferlen)
     KDEBUG(("cf_get_data\n"));
     UBYTE *end = (UBYTE *)(buffer + bufferlen);
     
-    // EmuTOS checks once for a whole sector
     cf_wait_for_data_ready();
     while (buffer < end) 
     {
