@@ -1,5 +1,5 @@
 
-#define ENABLE_KDEBUG
+/*#define ENABLE_KDEBUG*/
 
 #include "emutos.h"
 #include "asm.h"
@@ -148,6 +148,8 @@ LONG cf_ioctl(WORD dev, UWORD ctrl, void *arg)
         ret = cf_identify();
         if (ret >= 0) {
             identify.model_number[39] = 0;  /* null terminate string */
+
+            // TODO: name bytes are swapped, aSDnsi kDSFC-B23
 
             /* remove right padding with spaces */
             for (i = 38; i >= 0 && identify.model_number[i] == ' '; i--)
