@@ -15,7 +15,7 @@
  * Note: this driver does not support CHS addressing.
  */
 
-#define ENABLE_KDEBUG
+/* #define ENABLE_KDEBUG */
 
 #include "emutos.h"
 #include "asm.h"
@@ -1073,7 +1073,6 @@ static LONG ide_read(UBYTE cmd,UWORD ifnum,UWORD dev,ULONG sector,UWORD count,UB
 
     return rc;
 }
-
 
 /*
  * send data to IDE device

@@ -263,8 +263,6 @@ void disk_init_all(void)
  */
 LONG disk_mediach(UWORD unit)
 {
-    KDEBUG(("disk_mediach\n"));
-
     UWORD major = unit - NUMFLOPPIES;
     LONG ret;
     WORD bus, reldev;
@@ -799,8 +797,6 @@ static LONG natfeats_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, c
 /* Get unit information, using our internal drivers only. */
 static LONG internal_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, char *productname, UWORD stringlen)
 {
-    KDEBUG(("internal_inquire("));
-
     UWORD major = unit - NUMFLOPPIES;
     LONG ret;
     WORD bus, reldev;
@@ -881,7 +877,6 @@ LONG disk_inquire(UWORD unit, ULONG *blocksize, ULONG *deviceflags, char *produc
 /* Get unit capacity */
 LONG disk_get_capacity(UWORD unit, ULONG *blocks, ULONG *blocksize)
 {
-    KDEBUG(("disk_get_capacity\n"));
     UWORD major = unit - NUMFLOPPIES;
     LONG ret;
     ULONG info[2] = { 0UL, 512UL }; /* #sectors, sectorsize */
