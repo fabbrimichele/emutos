@@ -69,7 +69,7 @@ help:
 	@echo "flop    $(EMUTOS_ST), a bootable floppy with RAM tos"
 	@echo "pak3    $(ROM_PAK3), suitable for PAK/3 systems"
 	@echo "cart    $(ROM_CARTRIDGE), EmuTOS as a diagnostic cartridge"
-	@echo "rt68    $(IMG_RT68), EmuTOS as a diagnostic cartridge"
+	@echo "rt68    $(IMG_RT68), EmuTOS porting to RT68 computer"
 	@echo "clean   remove temporary files"
 	@echo "Use '$(MAKE) help-develop' for development-oriented targets"
 	@echo "Use '$(MAKE) help-multi' for multi-image targets"
@@ -673,8 +673,8 @@ NODEP += rt68
 rt68: UNIQUE = $(COUNTRY)
 rt68: OPTFLAGS = $(SMALL_OPTFLAGS)
 rt68: override DEF += -DTARGET_RT68_IMG $(RT68_DEFS)
-rt68: WITH_AES = 0
-rt68: WITH_CLI = 1
+rt68: WITH_AES = 1		# Either Graphic display, Ctrl+z to start console
+rt68: WITH_CLI = 0		# or console
 rt68: ROMSIZE = 512
 rt68: ROM_PADDED = $(IMG_RT68)
 rt68:
