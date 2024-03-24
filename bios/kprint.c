@@ -33,6 +33,7 @@
 #include "ikbd.h"
 #include "midi.h"
 #include "amiga.h"
+#include "rt68.h"
 
 #define DISPLAY_INSTRUCTION_AT_PC   0   /* set to 1 for extra info from dopanic() */
 #define DISPLAY_STACK               0   /* set to 1 for extra info from dopanic() */
@@ -130,6 +131,17 @@ static void kprintf_outc_stonx(int c)
 }
 #endif
 
+#if RT68_DEBUG_PRINT
+static void kprintf_outc_rt68_rs232(int c)
+{
+    /* Raw terminals usually require CRLF */
+    if ( c == '\n')
+        rt68_rs232_writeb('\r');
+
+    rt68_rs232_writeb((char)c);
+}
+#endif
+
 #if COLDFIRE_DEBUG_PRINT
 static void kprintf_outc_coldfire_rs232(int c)
 {
@@ -186,6 +198,10 @@ static int vkprintf(const char *fmt, va_list ap)
             SuperToUser(stacksave);     /* switch back.    */
         return rc;
     }
+#endif
+
+#if RT68_DEBUG_PRINT
+    return doprintf(kprintf_outc_rt68_rs232, fmt, ap);
 #endif
 
 #if COLDFIRE_DEBUG_PRINT

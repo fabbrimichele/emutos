@@ -21,6 +21,7 @@
 #include "conout.h"
 #include "vt52.h"
 #include "bios.h"
+#include "rt68.h"
 
 #if CONF_SERIAL_CONSOLE_ANSI
 /* We disable cursor home commands because it is more convenient */

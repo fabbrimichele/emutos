@@ -26,6 +26,7 @@
 #define IS_SCSI_DEVICE(major)   (GET_BUS(major) == SCSI_BUS)
 #define IS_IDE_DEVICE(major)    (GET_BUS(major) == IDE_BUS)
 #define IS_SDMMC_DEVICE(major)  (GET_BUS(major) == SDMMC_BUS)
+#define IS_CF_DEVICE(major)     (GET_BUS(major) == CF_BUS)
 
 #define GET_UNITNUM(bus,dev)    (NUMFLOPPIES+(DEVICES_PER_BUS*(bus))+dev)
 

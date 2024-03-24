@@ -524,6 +524,15 @@ _int_timerc:
         movem.l d0-d7/a0-a6,-(sp)       // save registers
 #endif
 
+        // TODO: RT68 implement a real VBL (vertical blank interrupt)
+        //       in the RT68 framebuffer hardware
+        // Faked VBL for platforms which don't have one
+#ifdef CONF_WITH_FAKE_VBL
+        // Note this is executed every 4 interrupts, 
+        // see `rol.w   _timer_c_sieve` a few lines above
+        jsr     _int_vbl
+#endif
+
         // repeat keys
         jsr     _kb_timerc_int
 
@@ -1433,6 +1442,7 @@ _keyclick:
 // ==== Variables ============================================================
 
         .bss
+
         .even
 
         .ds.w    256            // this stack is only used by dopanic()

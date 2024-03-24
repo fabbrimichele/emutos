@@ -23,7 +23,7 @@
 #include "sound.h"              /* for bell() */
 #include "string.h"
 #include "conout.h"
-
+#include "rt68.h"
 
 
 #define PLANE_OFFSET    2       /* interleaved planes */
