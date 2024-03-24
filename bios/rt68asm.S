@@ -83,12 +83,21 @@ duart_interrupt:
     movem.l d0/a0,-(sp)                         // Save working register
     lea     _duart,a0
     btst.b  #DUART_IMR_RXRDYA,DUART_ISR(a0)     // Test A Receiver Ready interrupt    
-    beq     duart_interrupt_test_counter        // No interrupt then test Counter Ready
-    move.b  DUART_RBA(A0),d0                    // Else read the character received by port A
+    beq     duart_interrupt_test_portb          // No port A interrupt then test port B
+    move.b  DUART_RBA(a0),d0                    // Else read the character received by port A
     move.w  d0, -(%sp)                          // I see that w is used also for bytes                                                
     jsr     _rt68_rs232_interrupt               // when passing parameters to C functions
     add.l   #2, sp                              // remove parameter from the SP
     bra     duart_interrupt_end
+
+duart_interrupt_test_portb:    
+    btst.b  #DUART_IMR_RXRDYB,DUART_ISR(a0)     // Test B Receiver Ready interrupt    
+    beq     duart_interrupt_test_counter        // No interrupt then test Counter Ready
+    moveq   #0,d0                               // ikdbraw expects d0 long
+    move.b  DUART_RBB(a0),d0                    // Else read the character received by port B
+    jsr     ikbdraw
+    bra     duart_interrupt_end
+
 duart_interrupt_test_counter:    
     btst.b  #DUART_IMR_CNTRDY,DUART_ISR(a0)     // Test Counter Ready interrupt    
     beq     duart_interrupt_end                 // No Counter Ready return

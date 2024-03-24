@@ -18,8 +18,10 @@ rt68: WITH_CLI = 0		# or console
 
 Once the graphic UI has started, press `CTRL`+`Z`
 
-
-# Bugs
+## Mouse emulation with keyboard:
+* ALT + arrow keys -> move mouse
+* ALT + Insert -> left mouse button
+* ALT + Home -> right mouse button
 
 # Useful infos
 * https://github.com/emutos/emutos/compare/master...aslak3:emutos:master
@@ -41,6 +43,11 @@ That should be compatible with RT68 ROM boot mapping performed by the GLUE CPLD.
 
 
 # TODO
-* the graphic environment is shown with color inverted (fixed)
 * implement serial driver
 * implement mouse and keyboard drivers
+
+## Keyboard support
+* The serial interrupt vector sends received characters to `call_ikbdraw`
+
+# Bugs
+
