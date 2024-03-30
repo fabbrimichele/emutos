@@ -21,11 +21,11 @@
 
 #include "../aes/gemdosif.h"
 
-//#ifdef __mcoldfire__
+#ifdef __mcoldfire__
 #define ASM_BLIT_IS_AVAILABLE   0   /* assembler routine does not support ColdFire */
-//#else
-//#define ASM_BLIT_IS_AVAILABLE   1   /* may use m68k assembler fast_bit_blt routine */
-//#endif
+#else
+#define ASM_BLIT_IS_AVAILABLE   1   /* may use m68k assembler fast_bit_blt routine */
+#endif
 
 
 #if CONF_WITH_BLITTER || !ASM_BLIT_IS_AVAILABLE
