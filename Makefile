@@ -692,6 +692,8 @@ $(IMG_RT68): emutos.img
 write-rom:
 	minipro -p SST39SF040 -w emutos-rt68.img
 
+dump:
+	$(OBJDUMP) --target=binary --architecture=m68k -D emutos.img > etos-dump.s
 
 # Special Amiga ROM optimized for Vampire V2
 

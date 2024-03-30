@@ -80,7 +80,7 @@ _rt68_int_1:
     rts
 
 duart_interrupt:
-    movem.l d0/a0,-(sp)                         // Save working register
+    movem.l d0-d7/a0-a6,-(sp)                   // Save working register
     lea     _duart,a0
     btst.b  #DUART_IMR_RXRDYA,DUART_ISR(a0)     // Test A Receiver Ready interrupt    
     beq     duart_interrupt_test_portb          // No port A interrupt then test port B
@@ -117,7 +117,7 @@ duart_interrupt_count_ret:
     lea     _duart,a0
     tst.b   DUART_STRC(a0)                  // Enable timer interrupt
 duart_interrupt_end:    
-    movem.l (sp)+,d0/a0                     // Restore working register
+    movem.l (sp)+,d0-d7/a0-a6               // Restore working register
     rte
 
 

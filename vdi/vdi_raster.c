@@ -19,11 +19,13 @@
 #include "tosvars.h"
 #include "has.h"        /* for blitter-related items */
 
-#ifdef __mcoldfire__
+#include "../aes/gemdosif.h"
+
+//#ifdef __mcoldfire__
 #define ASM_BLIT_IS_AVAILABLE   0   /* assembler routine does not support ColdFire */
-#else
-#define ASM_BLIT_IS_AVAILABLE   1   /* may use m68k assembler fast_bit_blt routine */
-#endif
+//#else
+//#define ASM_BLIT_IS_AVAILABLE   1   /* may use m68k assembler fast_bit_blt routine */
+//#endif
 
 
 #if CONF_WITH_BLITTER || !ASM_BLIT_IS_AVAILABLE
@@ -338,6 +340,8 @@ do_blit(BLITVARS * blt)
     UWORD   xc;
 
     KDEBUG(("do_blit(): Start\n"));
+    //disable_interrupts(); // Only for debugging purpose
+
     /*
      * note: because HOP is always set to source, the halftone RAM
      * and the starting halftone line number (status&0x0f) are not
@@ -470,6 +474,7 @@ do_blit(BLITVARS * blt)
         blt->dst_addr += blt->dst_y_inc;
     } while(--blt->y_cnt != 0);
     /* blt->status &= ~BUSY; */
+    //enable_interrupts();
 }
 #endif
 
@@ -970,20 +975,25 @@ cpy_raster(struct raster_t *raster, struct blit_frame *info)
      * (a) the blitter isn't configured, or
      * (b) it's configured but not available.
      */
+    KDEBUG(("Calling fast_bit_blt..."));
 #if ASM_BLIT_IS_AVAILABLE
 #if CONF_WITH_BLITTER
     if (blitter_is_enabled)
     {
+        KDEBUG(("Calling bit_blt..."));
         bit_blt(info);
     }
     else
 #endif
     {
+        KDEBUG(("Calling fast_bit_blt..."));
         fast_bit_blt(info);
     }
 #else
+    KDEBUG(("Calling bit_blt..."));
     bit_blt(info);
 #endif
+    KDEBUG((" done\n"));
 }
 
 /*
