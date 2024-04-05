@@ -4,7 +4,7 @@
 
 #define RT68_PLANES             1
 #define RT68_SCREEN_WIDTH       640
-#define RT68_SCREEN_HEIGHT      400
+#define RT68_SCREEN_HEIGHT      480
 
 // Ide
 struct IDE
