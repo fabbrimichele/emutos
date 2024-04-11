@@ -37,6 +37,8 @@ extern void rt68_rs232_writeb(UBYTE b);
 extern void rt68_rs232_interrupt(UBYTE b);
 // _rt68_68681_init is for driver internal use 
 extern void rt68_68681_init(void);
+extern void rt68_ikbd_writeb(UBYTE b);
+
 
 
 // Screen

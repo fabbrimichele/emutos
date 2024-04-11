@@ -43,9 +43,13 @@ extern void rt68_init_system_timer(void)
 //*******************************************
 // Serial
 //*******************************************
+// TODO: replace names with the same used for port B (and rotol68)
 #define SERDATR     *(volatile UBYTE*)0x37e801
 #define SERDAT      *(volatile UBYTE*)0x37e803
 #define SERDAT_TBE  4 /* bit2: Transmit Buffer */
+
+#define DUART_SRB           *(volatile UBYTE*)0x37e809
+#define DUART_TBB           *(volatile UBYTE*)0x37e80B
 
 void rt68_rs232_init(void) 
 { 
@@ -83,6 +87,16 @@ void rt68_rs232_interrupt(UBYTE b)
     // This enable the standard serial serial input stream
     push_serial_iorec(b);
 #endif
+}
+
+void rt68_ikbd_writeb(UBYTE b)
+{
+    if (rt68_rs232_initialized == FALSE)
+        return;
+
+    // TODO: implement timeout?
+    while (!(DUART_SRB & SERDAT_TBE)) {}
+    DUART_TBB = b;
 }
 
 //*******************************************

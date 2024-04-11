@@ -13,7 +13,7 @@
  * option any later version.  See doc/license.txt for details.
  */
 
-/* #define ENABLE_KDEBUG */
+#define ENABLE_KDEBUG
 
 #include "emutos.h"
 #include "clock.h"
@@ -963,6 +963,10 @@ static struct ikbdregs
 static volatile WORD iclk_ready;
 
 #define IKBD_CLOCK_TIMEOUT  (2*CLOCKS_PER_SEC)  /* 2 seconds */
+#if defined(MACHINE_RT68)
+    IKBD_CLOCK_TIMEOUT  (2*CLOCKS_PER_SEC)  /* 4 seconds */
+#endif
+
 
 /* called by the ACIA interrupt */
 /* EmuTOS's ikbdsys also puts the buffer on the stack */
