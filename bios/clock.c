@@ -963,15 +963,12 @@ static struct ikbdregs
 static volatile WORD iclk_ready;
 
 #define IKBD_CLOCK_TIMEOUT  (2*CLOCKS_PER_SEC)  /* 2 seconds */
-#if defined(MACHINE_RT68)
-    IKBD_CLOCK_TIMEOUT  (2*CLOCKS_PER_SEC)  /* 4 seconds */
-#endif
-
 
 /* called by the ACIA interrupt */
 /* EmuTOS's ikbdsys also puts the buffer on the stack */
 void clockvec(char *buf)
 {
+    KDEBUG(("clockvec(char *buf)\n"));
     char *b = 1 + ((char *)&iclkbuf);
 
     memmove(b, buf, 6);
@@ -983,6 +980,7 @@ void clockvec(char *buf)
 
 static void igetregs(void)
 {
+    KDEBUG(("igetregs(void)\n"));
     LONG timeout;
 
     iclk_ready = 0;
@@ -993,6 +991,7 @@ static void igetregs(void)
     timeout = hz_200 + IKBD_CLOCK_TIMEOUT;
     while(!iclk_ready && (timeout > hz_200))
         ;
+    KDEBUG(("iclk_ready %d\n", iclk_ready));
 }
 
 static void isetregs(void)
