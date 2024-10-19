@@ -536,6 +536,9 @@ static ULONG check_busses(void)
     if (detect_ide())
         found |= (1 << IDE_BUS);
 #endif
+#if CONF_WITH_CF
+        found |= (1 << CF_BUS);
+#endif
 
     return found;
 }
@@ -834,6 +837,8 @@ const char * machine_name(void)
     return "Apple Lisa";
 #elif defined(MACHINE_M548X)
     return m548x_machine_name();
+#elif defined(MACHINE_RT68)
+    return "RT68";
 #else
     return guess_machine_name();
 #endif

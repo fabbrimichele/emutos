@@ -37,6 +37,7 @@
 #include "amiga.h"
 #include "lisa.h"
 #include "nova.h"
+#include "rt68.h"
 
 void detect_monitor_change(void);
 static void setphys(const UBYTE *addr);
@@ -686,6 +687,10 @@ int rez_changeable(void)
     return TRUE;
 #endif
 
+#ifdef MACHINE_RT68
+    return FALSE;
+#endif
+
 #if CONF_WITH_VIDEL
     if (has_videl)  /* can't change if real ST monochrome monitor */
         return (VgetMonitor() != MON_MONO);
@@ -721,6 +726,9 @@ struct video_mode {
 };
 
 static const struct video_mode vmode_table[] = {
+#ifdef MACHINE_RT68
+    { 2,  640, 400},		    /* RT68 Framebuffer */
+#endif    
     { 4,  320, 200},            /* rez=0: ST low */
     { 2,  640, 200},            /* rez=1: ST medium */
     { 1,  640, 400},            /* rez=2: ST high */
@@ -744,6 +752,8 @@ ULONG calc_vram_size(void)
 {
 #ifdef MACHINE_AMIGA
     return amiga_initial_vram_size();
+#elif defined(MACHINE_RT68)
+    return rt68_initial_vram_size();
 #elif defined(MACHINE_LISA)
     return 32*1024UL;
 #else
@@ -800,6 +810,10 @@ void screen_get_current_mode_info(UWORD *planes, UWORD *hz_rez, UWORD *vt_rez)
 
 #ifdef MACHINE_AMIGA
     amiga_get_current_mode_info(planes, hz_rez, vt_rez);
+#elif defined(MACHINE_RT68)
+    *planes = RT68_PLANES;
+    *hz_rez = RT68_SCREEN_WIDTH;
+    *vt_rez = RT68_SCREEN_HEIGHT;    
 #elif defined(MACHINE_LISA)
     *planes = 1;
     *hz_rez = 720;
@@ -817,6 +831,8 @@ void screen_get_current_mode_info(UWORD *planes, UWORD *hz_rez, UWORD *vt_rez)
 WORD get_palette(void)
 {
 #ifdef MACHINE_AMIGA
+    return 2;               /* we currently only support monochrome */
+#elif defined(MACHINE_RT68)
     return 2;               /* we currently only support monochrome */
 #else
     WORD palette;
@@ -881,6 +897,8 @@ static __inline__ void get_std_pixel_size(WORD *width,WORD *height)
 void get_pixel_size(WORD *width,WORD *height)
 {
 #ifdef MACHINE_AMIGA
+    get_std_pixel_size(width,height);
+#elif defined(MACHINE_RT68)
     get_std_pixel_size(width,height);
 #else
     if (HAS_VIDEL || HAS_TT_SHIFTER)
@@ -1029,6 +1047,8 @@ const UBYTE *physbase(void)
 {
 #ifdef MACHINE_AMIGA
     return amiga_physbase();
+#elif defined(MACHINE_RT68)
+    return rt68_physbase();
 #elif defined(MACHINE_LISA)
     return lisa_physbase();
 #elif CONF_WITH_ATARI_VIDEO
@@ -1047,6 +1067,8 @@ static void setphys(const UBYTE *addr)
 
 #ifdef MACHINE_AMIGA
     amiga_setphys(addr);
+#elif defined(MACHINE_rt68)
+    rt68_setphys(addr);
 #elif defined(MACHINE_LISA)
     lisa_setphys(addr);
 #elif CONF_WITH_ATARI_VIDEO

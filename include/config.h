@@ -562,6 +562,13 @@
 #endif
 
 /*
+ * Defaults for rt68 targets
+ */
+#ifdef TARGET_RT68_IMG
+# define MACHINE_RT68
+#endif
+
+/*
  * Defaults for the Amiga machine
  */
 #ifdef MACHINE_AMIGA
@@ -642,6 +649,43 @@
 # ifndef AES_STACK_SIZE
 #  define AES_STACK_SIZE 2048   /* in LONGs */
 # endif
+#endif
+
+
+/*
+ * Defaults for the rt68 machine
+ */
+#ifdef MACHINE_RT68
+# ifndef CONF_ATARI_HARDWARE
+#  define CONF_ATARI_HARDWARE 0
+# endif
+# ifndef CONF_WITH_FLEXCAN
+#  define CONF_WITH_FLEXCAN 0
+# endif
+# ifndef CONF_DETECT_FIRST_BOOT_WITHOUT_MEMCONF
+#  define CONF_DETECT_FIRST_BOOT_WITHOUT_MEMCONF 0
+# endif
+# ifndef RT68_DEBUG_PRINT
+#  define RT68_DEBUG_PRINT 0
+# endif
+# ifndef CONF_SERIAL_CONSOLE
+#  define CONF_SERIAL_CONSOLE 1
+# endif
+# ifndef CONF_WITH_BUS_ERROR
+#  define CONF_WITH_BUS_ERROR 1
+# endif
+# ifndef CONF_VRAM_ADDRESS                        
+#  define CONF_VRAM_ADDRESS 0x00370000                            
+# endif
+# ifndef CONF_WITH_FAKE_VBL
+#  define CONF_WITH_FAKE_VBL 1
+# endif
+#ifndef CONF_WITH_CF
+# define CONF_WITH_CF 1
+#endif
+#ifndef CONF_WITH_IKBD_CLOCK
+# define CONF_WITH_IKBD_CLOCK 1
+#endif
 #endif
 
 /*
@@ -1030,6 +1074,10 @@
  */
 #ifndef CONF_WITH_IDE
 # define CONF_WITH_IDE 1
+#endif
+
+#ifndef CONF_WITH_CF
+# define CONF_WITH_CF 1
 #endif
 
 /*
@@ -1955,8 +2003,12 @@
 # define MIDI_DEBUG_PRINT 0
 #endif
 
+#ifndef RT68_DEBUG_PRINT
+# define RT68_DEBUG_PRINT 0
+#endif
+
 /* Determine if kprintf() is available */
-#if CONF_WITH_UAE || DETECT_NATIVE_FEATURES || STONX_NATIVE_PRINT || CONSOLE_DEBUG_PRINT || RS232_DEBUG_PRINT || SCC_DEBUG_PRINT || COLDFIRE_DEBUG_PRINT || MIDI_DEBUG_PRINT
+#if CONF_WITH_UAE || DETECT_NATIVE_FEATURES || STONX_NATIVE_PRINT || CONSOLE_DEBUG_PRINT || RS232_DEBUG_PRINT || SCC_DEBUG_PRINT || RT68_DEBUG_PRINT || COLDFIRE_DEBUG_PRINT || MIDI_DEBUG_PRINT
 #  define HAS_KPRINTF 1
 # else
 #  define HAS_KPRINTF 0
@@ -2152,7 +2204,7 @@
 # endif
 #endif
 
-#if (CONSOLE_DEBUG_PRINT + RS232_DEBUG_PRINT + SCC_DEBUG_PRINT + COLDFIRE_DEBUG_PRINT + MIDI_DEBUG_PRINT) > 1
+#if (CONSOLE_DEBUG_PRINT + RS232_DEBUG_PRINT + SCC_DEBUG_PRINT + RT68_DEBUG_PRINT + COLDFIRE_DEBUG_PRINT + MIDI_DEBUG_PRINT) > 1
 # error Only one of CONSOLE_DEBUG_PRINT, RS232_DEBUG_PRINT, SCC_DEBUG_PRINT, COLDFIRE_DEBUG_PRINT or MIDI_DEBUG_PRINT must be set to 1.
 #endif
 

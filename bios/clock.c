@@ -13,7 +13,7 @@
  * option any later version.  See doc/license.txt for details.
  */
 
-/* #define ENABLE_KDEBUG */
+#define ENABLE_KDEBUG
 
 #include "emutos.h"
 #include "clock.h"
@@ -968,6 +968,7 @@ static volatile WORD iclk_ready;
 /* EmuTOS's ikbdsys also puts the buffer on the stack */
 void clockvec(char *buf)
 {
+    KDEBUG(("clockvec(char *buf)\n"));
     char *b = 1 + ((char *)&iclkbuf);
 
     memmove(b, buf, 6);
@@ -979,6 +980,7 @@ void clockvec(char *buf)
 
 static void igetregs(void)
 {
+    KDEBUG(("igetregs(void)\n"));
     LONG timeout;
 
     iclk_ready = 0;
@@ -989,6 +991,7 @@ static void igetregs(void)
     timeout = hz_200 + IKBD_CLOCK_TIMEOUT;
     while(!iclk_ready && (timeout > hz_200))
         ;
+    KDEBUG(("iclk_ready %d\n", iclk_ready));
 }
 
 static void isetregs(void)

@@ -40,8 +40,11 @@
 #define SCSI_BUS            1
 #define IDE_BUS             2
 #define SDMMC_BUS           3
+#define CF_BUS              4
 
-#if CONF_WITH_SDMMC
+#if CONF_WITH_CF
+# define MAX_BUS            CF_BUS
+#elif CONF_WITH_SDMMC
 # define MAX_BUS            SDMMC_BUS
 #elif CONF_WITH_IDE
 # define MAX_BUS            IDE_BUS

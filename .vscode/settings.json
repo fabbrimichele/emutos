@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "random": "c",
+        "rt68.h": "c",
+        "optional": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "istream": "c",
+        "ostream": "c",
+        "algorithm": "c",
+        "asm.h": "c",
+        "emutos.h": "c",
+        "coldfire.h": "c",
+        "gemerror.h": "c",
+        "blkdev.h": "c",
+        "string.h": "c"
+    },
+    "makefile.configureOnOpen": false
+}
