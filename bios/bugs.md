@@ -1,3 +1,5 @@
+# Bugs
+## Line F bug
 From time to time when moving windows around or resizing them I get Panic error.
 So far I saw Panic: Line F Emulator. It only happens running at about 32MHZ, at 25MHz it does not happen.
 
@@ -19,4 +21,4 @@ basepage=00025b66
 text=003a4940 data=00000000 bss=00000000
 ```
 
-the PC seems to fails often at this line: 00391ee4
+The program counter (pc) seems to fails often at the line: `00391ee4`

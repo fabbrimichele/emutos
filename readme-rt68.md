@@ -52,9 +52,9 @@ That should be compatible with RT68 ROM boot mapping performed by the GLUE CPLD.
 
 # TODO
 * implement keyboard driver (DONE)
-* implement serial driver
-* implement mouse  driver
-* implement real time clock driver
+* implement serial driver (DONE)
+* implement mouse  driver (DONE)
+* implement real time clock driver (DONE)
 
 ## Keyboard support
 * The serial interrupt vector sends received characters to `call_ikbdraw`
