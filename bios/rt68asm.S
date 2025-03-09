@@ -50,6 +50,15 @@ _rt68_68681_init:
 _rt68_int_1:
     move.l a0,-(sp)    
     lea     _duart,a0
+
+    // VSync interrupt (autovector)
+    // The following shouldn't be necessary, the vector is configured in screen.c:500
+    // move.l  #vsync_interrupts,0x70       // Autovector address, interrupt 4 = $70
+
+    // This is theory shouldn't be required, it should be configured already by EmuTOS
+    // RT68 VSYC
+    // TODO: Find why it is required and if it is not set by EmutTOS move to its own function
+    move.l  #_int_vbl,0x70       // Autovector address, interrupt 4 = $70
       
     // It should not override the other bits!
     or.b    #0b0111000,DUART_ACR(a0)     // xCCCxxxx: CCC = 011 Timer Clk divided by 16
@@ -78,6 +87,11 @@ _rt68_int_1:
     and.w  #0b1111100011111111,SR    // set I2 I1 I0 = 000
     move.l (sp)+,a0
     rts
+
+    // VSync interrupts get triggered
+    // vsync_interrupts:
+    //    move.b  #1,_led1_port
+    //    rte    
 
 duart_interrupt:
     movem.l d0-d7/a0-a6,-(sp)                   // Save working register

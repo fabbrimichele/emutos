@@ -27,7 +27,7 @@ Once the graphic UI has started, press `CTRL`+`Z`
 |Device|Start      |End        |Size |
 |------|-----------|-----------|-----|
 |RAM   |0x0000 0000|0x0007 FFFF|512KB|
-|FB    |0x0037 0000|0x0037 7FFF| 32KB|
+|FB    |0x0037 0000|0x0037 7FFF| 32KB (to be updated, it's 64KB)|
 |ROM   |0x0038 0000|0x003F FFFF|512KB|
 
 # Useful infos

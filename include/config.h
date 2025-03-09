@@ -677,9 +677,12 @@
 # ifndef CONF_VRAM_ADDRESS                        
 #  define CONF_VRAM_ADDRESS 0x00370000                            
 # endif
+/* RT68 Now using actual vertical sync interrupt */
+/*
 # ifndef CONF_WITH_FAKE_VBL
 #  define CONF_WITH_FAKE_VBL 1
 # endif
+*/
 #ifndef CONF_WITH_CF
 # define CONF_WITH_CF 1
 #endif

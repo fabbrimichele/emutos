@@ -727,7 +727,9 @@ struct video_mode {
 
 static const struct video_mode vmode_table[] = {
 #ifdef MACHINE_RT68
-    { 2,  640, 400},		    /* RT68 Framebuffer */
+    /*TODO: why 400 and not 480? Where is 480 configured?*/
+    
+    { 2,  640, 480},		    /* RT68 Framebuffer */
 #endif    
     { 4,  320, 200},            /* rez=0: ST low */
     { 2,  640, 200},            /* rez=1: ST medium */
@@ -1214,7 +1216,11 @@ WORD setcolor(WORD colorNum, WORD color)
 void vsync(void)
 {
     LONG a;
+    WORD old_sr = set_sr(0x2300); // This was supposed to be used only for CONF_WITH_ATARI_VIDEO
 #if CONF_WITH_ATARI_VIDEO
+    // TODO: check what this does...
+    //       for example is it used when vsync interrupt is disabled?
+
     WORD old_sr = set_sr(0x2300);       /* allow VBL interrupt */
     /* Beware: as a side effect, MFP interrupts are also enabled.
      * So the MFP interruptions must be carefully initialized (or disabled)
@@ -1234,6 +1240,7 @@ void vsync(void)
 #if CONF_WITH_ATARI_VIDEO
     set_sr(old_sr);
 #endif /* CONF_WITH_ATARI_VIDEO */
+    set_sr(old_sr); // Same here
 }
 
 #if CONF_WITH_ATARI_VIDEO
