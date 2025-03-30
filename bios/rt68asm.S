@@ -55,7 +55,7 @@ _rt68_int_1:
     // The following shouldn't be necessary, the vector is configured in screen.c:500
     // move.l  #vsync_interrupts,0x70       // Autovector address, interrupt 4 = $70
 
-    // This is theory shouldn't be required, it should be configured already by EmuTOS
+    // TODO: This is theory shouldn't be required, it should be configured already by EmuTOS
     // RT68 VSYC
     // TODO: Find why it is required and if it is not set by EmutTOS move to its own function
     move.l  #_int_vbl,0x70       // Autovector address, interrupt 4 = $70

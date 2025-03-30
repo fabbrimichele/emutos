@@ -19,7 +19,12 @@ struct psg {
   UBYTE data;
 };
 
-#define PSG ((volatile struct psg *) 0xffff8800)
+// TODO: make it configurable
+// #define PSG ((volatile struct psg *) 0xffff8800)
+//
+// RT68
+#define PSG ((volatile struct psg *) 0x0037e400)
+
 
 /* bits in PSG_MULTI register */
 

@@ -59,7 +59,62 @@ That should be compatible with RT68 ROM boot mapping performed by the GLUE CPLD.
 ## Keyboard support
 * The serial interrupt vector sends received characters to `call_ikbdraw`
 
+## Sound support
+The sound chip YM2149 (PSG) in the Atari ST and EmuTOS is used as following.
+
+### Address decodig
+In the Atari ST, the PSG is mapped from 0xffff8800
+|Address   | Function|
+|----------|---------|
+|0xffff8800| when writing it is the ADDRESS, when reading it is DATA|
+|0xffff8802| it is only used to write WRITE|
+
+In the RT68 the mapping is:
+|Address   | Function|
+|----------|---------|
+|0x0037e400| when writing it is the ADDRESS, when reading it is DATA|
+|0x0037e402| it is only used to write WRITE|
+
+I implemented a simple C application: `emutos-rt68k\ym2149`, that 
+test the registers writing a reading a value and then plays a sound.
+
+Also the following basic program can be used in EHBasic:
+
+``` Basic
+10 CTL = $37E400
+20 DAT = $37E402
+30 PRINT "1) READ CTL",HEX$(CTL) 
+40 PRINT "2) WRITE 0 TO CTL",HEX$(CTL) 
+50 PRINT "3) READ DAT",HEX$(DAT) 
+60 PRINT "4) WRITE 0 TO DAT",HEX$(DAT) 
+70 PRINT "5) EXIT"
+80 INPUT OP
+100 IF OP=1 THEN PRINT PEEK(CTL)
+110 IF OP=2 THEN POKE CTL,0
+120 IF OP=3 THEN PRINT PEEK(DAT)
+130 IF OP=4 THEN POKE DAT,0
+140 IF OP=5 THEN END
+150 GOTO 30
+```
+
+![YM2149 Address Decoding](doc/img/YM2149_ADDR_DEC.png)
+
+### Interrupt
+The PSG has no interrupt but EmuTOS has a function `sndirq` called when the Timer C triggers.
+I have already implemented the Timer C that was used to refresh the screen before I implemented the VSYNC interrupt. 
+
+### Enable PSG in EmuTOS
+In order to enable PSG the preprocessor definition must be enable `CONF_WITH_YM2149`.
+
+There is a bug, see *Keyboard Sound Bug* in the section below.
+
+
 # Bugs
+
+## Keyboard Sound Bug
+When powering up RT68/EmuTOS, the keyboard beep plays as if a key is being 
+pressed. It stops as soon as any key is pressed. After that, including after 
+a reset, it works fine.
 
 ## Bus error bug
 When opening a menu most of the time a Bus error is thrown.

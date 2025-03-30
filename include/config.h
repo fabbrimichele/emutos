@@ -689,6 +689,9 @@
 #ifndef CONF_WITH_IKBD_CLOCK
 # define CONF_WITH_IKBD_CLOCK 1
 #endif
+# ifndef CONF_WITH_YM2149                        
+#  define CONF_WITH_YM2149 1                            
+# endif
 #endif
 
 /*

@@ -727,9 +727,8 @@ struct video_mode {
 
 static const struct video_mode vmode_table[] = {
 #ifdef MACHINE_RT68
-    /*TODO: why 400 and not 480? Where is 480 configured?*/
-    
-    { 2,  640, 480},		    /* RT68 Framebuffer */
+    //* TODO: I have the feeling this is not used at all, for example there is no Amiga configuration */
+    { 1,  640, 480},		    /* RT68 Framebuffer */
 #endif    
     { 4,  320, 200},            /* rez=0: ST low */
     { 2,  640, 200},            /* rez=1: ST medium */
