@@ -14,6 +14,7 @@
 #include "rt68.h"
 #include "tosvars.h"
 #include "ikbd.h"
+#include "serport.h"
 
 #ifdef MACHINE_RT68
 
