@@ -679,7 +679,7 @@
 #  define CONF_WITH_BUS_ERROR 1
 # endif
 # ifndef CONF_VRAM_ADDRESS                        
-#  define CONF_VRAM_ADDRESS 0x00370000                            
+#  define CONF_VRAM_ADDRESS 0x00350000                        
 # endif
 /* RT68 Now using actual vertical sync interrupt */
 /*

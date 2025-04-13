@@ -123,7 +123,7 @@ Possible reasons:
 * a bug in the `video_shifter`, I could try to increase the time befor bus error 
   is thrown. It has to be done in the glue cpld.
 * the blitter routines access inexistent memory address? How do I check this?
-  The framebuffer is located from 0x370000 to TOBE CHECKED
+  The framebuffer is located from 0x350000 to 0x36FFFF
 
 The problem may be an interrupt corrupting the registers.
 Disabling the interrupts inside the do blitter seems to reduce the number
