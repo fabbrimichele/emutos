@@ -28,6 +28,7 @@
 #include "acsi.h"
 #include "scsi.h"
 #include "ide.h"
+#include "cf.h"
 #include "sd.h"
 #include "scsidriv.h"
 #include "biosext.h"
@@ -219,10 +220,17 @@ static void bus_init(void)
     ide_init();
 #endif
 
+#if CONF_WITH_CF
+    cf_init();
+#endif
+
 #if CONF_WITH_SDMMC
     sd_init();
 #endif
 }
+
+#if CONF_WITH_CF
+#endif
 
 /*
  * blkdev_boot - boot from device in 'bootdev'

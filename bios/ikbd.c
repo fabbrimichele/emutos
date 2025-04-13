@@ -38,6 +38,7 @@
 #include "bios.h"
 #include "coldfire.h"
 #include "amiga.h"
+#include "rt68.h"
 #include "lisa.h"
 
 
@@ -963,6 +964,8 @@ void ikbd_writeb(UBYTE b)
     ikbd_acia.data = b;
 #elif CONF_WITH_FLEXCAN
     coldfire_flexcan_ikbd_writeb(b);
+#elif defined(MACHINE_RT68)
+    rt68_ikbd_writeb(b);
 #elif defined(MACHINE_AMIGA)
     amiga_ikbd_writeb(b);
 #endif

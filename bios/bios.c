@@ -62,6 +62,7 @@
 #include "amiga.h"
 #include "lisa.h"
 #include "coldfire.h"
+#include "rt68.h"
 #if WITH_CLI
 #include "../cli/clistub.h"
 #endif
@@ -227,6 +228,11 @@ static void bios_init(void)
     KDEBUG(("amiga_uae_init()\n"));
     amiga_uae_init();
 #endif
+#if defined(MACHINE_RT68)
+    KDEBUG(("rt68_init()\n"));
+    rt68_init();
+#endif
+
 
     /* Initialize the processor */
     KDEBUG(("processor_init()\n"));

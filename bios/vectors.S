@@ -486,7 +486,9 @@ vbl_end:
 #if CONF_WITH_ATARI_VIDEO
         rte
 #else
-        rts
+        //rts
+        rte
+        // TODO: should be configured using CONF RT68
 #endif
 
 // ==== Timer C interrupt handler ============================================
@@ -522,6 +524,14 @@ _int_timerc:
         movem.l d1-d7/a1-a6,(sp)        // save registers
 #else
         movem.l d0-d7/a0-a6,-(sp)       // save registers
+#endif
+
+        // Faked VBL for platforms which don't have one
+        // RT68 required when there is no vertical sync interrupt        
+#ifdef CONF_WITH_FAKE_VBL
+        // Note this is executed every 4 interrupts, 
+        // see `rol.w   _timer_c_sieve` a few lines above
+        jsr     _int_vbl
 #endif
 
         // repeat keys
@@ -1433,6 +1443,7 @@ _keyclick:
 // ==== Variables ============================================================
 
         .bss
+
         .even
 
         .ds.w    256            // this stack is only used by dopanic()

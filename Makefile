@@ -69,6 +69,7 @@ help:
 	@echo "flop    $(EMUTOS_ST), a bootable floppy with RAM tos"
 	@echo "pak3    $(ROM_PAK3), suitable for PAK/3 systems"
 	@echo "cart    $(ROM_CARTRIDGE), EmuTOS as a diagnostic cartridge"
+	@echo "rt68    $(IMG_RT68), EmuTOS porting to RT68 computer"
 	@echo "clean   remove temporary files"
 	@echo "Use '$(MAKE) help-develop' for development-oriented targets"
 	@echo "Use '$(MAKE) help-multi' for multi-image targets"
@@ -303,11 +304,15 @@ bios_src +=  memory.S processor.S vectors.S aciavecs.S bios.c xbios.c acsi.c \
              mfp.c midi.c mouse.c natfeat.S natfeats.c nvram.c panicasm.S \
              parport.c screen.c serport.c sound.c videl.c vt52.c xhdi.c \
              pmmu030.c 68040_pmmu.S \
+			 rt68.c rt68asm.S cf.c \
              amiga.c amiga2.S spi_vamp.c \
              lisa.c lisa2.S \
              delay.c delayasm.S sd.c memory2.c bootparams.c scsi.c nova.c \
              dsp.c dsp2.S \
              scsidriv.c
+
+# NOTE: Do not add a file with rt68.D it will make the compilation fail
+#       with an error related to 'multiple definition of...'
 
 ifeq (1,$(COLDFIRE))
   bios_src += coldfire.c coldfire2.S spi_cf.c
@@ -653,6 +658,42 @@ amiga:
 
 $(ROM_AMIGA): emutos.img mkrom
 	./mkrom amiga $< $(ROM_AMIGA)
+
+#
+# RT68 Image
+#
+
+TOCLEAN += *.img
+
+IMG_RT68 = emutos-rt68.img
+RT68_DEFS =
+
+.PHONY: rt68
+NODEP += rt68
+rt68: UNIQUE = $(COUNTRY)
+rt68: OPTFLAGS = $(SMALL_OPTFLAGS)
+rt68: override DEF += -DTARGET_RT68_IMG $(RT68_DEFS)
+rt68: WITH_AES = 1		# Either Graphic display, Ctrl+z to start console
+rt68: WITH_CLI = 0		# or console
+rt68: ROMSIZE = 512
+rt68: ROM_PADDED = $(IMG_RT68)
+rt68:
+	@echo "# Building RT68 EmuTOS into $(ROM_PADDED)"
+	$(MAKE) RT68=1 CPUFLAGS='$(CPUFLAGS)' DEF='$(DEF)' OPTFLAGS='$(OPTFLAGS)' UNIQUE=$(COUNTRY) WITH_AES=$(WITH_AES) ROMSIZE=$(ROMSIZE) ROM_PADDED=$(ROM_PADDED) $(ROM_PADDED)
+	@printf "$(LOCALCONFINFO)"
+# TODO: it shouldn't be necessary to run ./mkrom manually, it should work passing the parameter ROM_PADDED=$(ROM_PADDED) to the make
+# TODO: check that the last bytes of the ROM are the starting address of the ROM
+	./mkrom pad $(ROMSIZE)k emutos.img $(IMG_RT68)
+	@ls -la *tos*.img
+
+$(IMG_RT68): emutos.img
+	cp $< $(IMG_RT68)
+
+write-rom:
+	minipro -p SST39SF040 -w emutos-rt68.img
+
+dump:
+	$(OBJDUMP) --target=binary --architecture=m68k -D emutos.img > etos-dump.s
 
 # Special Amiga ROM optimized for Vampire V2
 
