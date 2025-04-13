@@ -23,12 +23,21 @@ Once the graphic UI has started, press `CTRL`+`Z`
 * ALT + Insert -> left mouse button
 * ALT + Home -> right mouse button
 
-# Framebuffer memory layout:  
-|Device|Start      |End        |Size |
-|------|-----------|-----------|-----|
-|RAM   |0x0000 0000|0x0007 FFFF|512KB|
-|FB    |0x0037 0000|0x0037 7FFF| 32KB (to be updated, it's 64KB)|
-|ROM   |0x0038 0000|0x003F FFFF|512KB|
+# Memory layout:  
+| Address range     | Device      | Size   |
+|-------------------|-------------|-------:|
+| $000000 - $07FFFF | RAM         |  512KB |
+| $080000 - $34FFFF | Unmapped    | 2880KB |
+| $350000 - $36FFFF | Framebuffer |  128KB |
+| $370000 - $37BFFF | Unmapped    |   57KB |
+| $37E400 - $37E7FF | YM2149      |    1KB |
+| $37E800 - $37EBFF | MC68681     |    1KB |
+| $37EC00 - $37EFFF | Unmapped    |    1KB |
+| $37F000 - $37F3FF | Free        |    1KB |
+| $37F400 - $37F7FF | Free        |    1KB |
+| $37F800 - $37FBFF | CF card     |    1KB |
+| $37FC00 - $37FFFF | LED         |    1KB |
+| $380000 - $3FFFFF | ROM         |  512KB |
 
 # Useful infos
 * https://github.com/emutos/emutos/compare/master...aslak3:emutos:master
